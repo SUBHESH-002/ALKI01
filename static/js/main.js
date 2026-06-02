@@ -20,13 +20,10 @@ socket.on('emotion_update', (data) => {
     const newEmotion = data.emotion;
     console.log('Emotion changed to:', newEmotion);
     
-    // Update UI text (placeholder)
-    emotionLabel.innerText = newEmotion;
+    // Update UI text
     chatText.innerText = `You look ${newEmotion}!`;
 
-    // Remove all old emotion classes
-    character.classList.remove('neutral', 'happy', 'sad', 'surprised');
-    
-    // Add the new emotion class (triggers CSS animation/color change)
-    character.classList.add(newEmotion);
+    // Swap the character image (Day 2 visual logic)
+    // Make sure you have neutral.gif, happy.gif, sad.gif, and surprised.gif in your static/assets folder!
+    character.src = `/static/assets/${newEmotion}.gif`;
 });

@@ -17,11 +17,8 @@
 
     <!-- Character Display Area -->
     <div class="character-viewport">
-        <!-- For Phase 1 we will just use a div that changes background color/text as a placeholder 
-             until we get the real sprites on Day 2 -->
-        <div class="sprite-strip" id="alki-character">
-            <span id="emotion-label">neutral</span>
-        </div>
+        <!-- For Day 2: We use an actual image that we will swap via Javascript -->
+        <img id="alki-character" src="{{ url_for('static', filename='assets/neutral.gif') }}" alt="ALKI Character" style="max-width: 100%; max-height: 100%; object-fit: contain;">
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

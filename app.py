@@ -5,7 +5,7 @@ import threading
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'alki_secret_key'
-socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/')
 def index():
