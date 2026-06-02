@@ -1,0 +1,64 @@
+body {
+    background-color: #121212;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* The Chat Bubble */
+.chat-bubble {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 15px 25px;
+    margin-bottom: 30px;
+    max-width: 80%;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s ease;
+}
+
+#chat-text {
+    margin: 0;
+    font-size: 1.2rem;
+    line-height: 1.4;
+}
+
+/* The Viewport Window (Placeholder for now) */
+.character-viewport {
+    width: 200px;
+    height: 200px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Placeholder for the Character */
+.sprite-strip {
+    width: 100%;
+    height: 100%;
+    background-color: #333;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+}
+
+/* Emotion state colors for the placeholder */
+.sprite-strip.happy { background-color: #4CAF50; box-shadow: 0 0 40px #4CAF50; transform: scale(1.05); }
+.sprite-strip.sad { background-color: #2196F3; box-shadow: 0 0 40px #2196F3; transform: translateY(10px); }
+.sprite-strip.surprised { background-color: #FF9800; box-shadow: 0 0 40px #FF9800; transform: scale(1.1); }
+.sprite-strip.neutral { background-color: #9E9E9E; box-shadow: 0 0 20px #9E9E9E; }

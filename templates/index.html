@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALKI Companion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Load Socket.IO from CDN for Day 1 prototyping -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+</head>
+<body>
+
+    <!-- Chat Bubble for Output -->
+    <div class="chat-bubble" id="chat-bubble">
+        <p id="chat-text">Hello! I am ALKI. I am booting up...</p>
+    </div>
+
+    <!-- Character Display Area -->
+    <div class="character-viewport">
+        <!-- For Phase 1 we will just use a div that changes background color/text as a placeholder 
+             until we get the real sprites on Day 2 -->
+        <div class="sprite-strip" id="alki-character">
+            <span id="emotion-label">neutral</span>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
