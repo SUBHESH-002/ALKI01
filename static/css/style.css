@@ -69,8 +69,9 @@ body {
 
 #alki-paperdoll div {
     position: absolute;
-    background-image: url('/static/assets/rei_sprite_alpha.png');
+    background-image: url('/static/assets/rem_sprite_alpha.png');
     background-repeat: no-repeat;
+    mix-blend-mode: screen; /* Hides the black boxes from the Rem sprite sheet */
 }
 
 #layer-base-head {

@@ -2,31 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ALKI Sprite Aligner</title>
+    <title>ALKI Sprite Aligner (Rem Edition)</title>
     <style>
         body { background: #333; color: white; font-family: sans-serif; display: flex; gap: 40px; padding: 20px; }
         
-        /* The exact CSS from style.css */
         #alki-paperdoll {
             position: relative;
-            width: 150px;
-            height: 150px;
-            transform: scale(2);
+            width: 400px;
+            height: 600px;
+            transform: scale(1);
             transform-origin: top left;
             border: 1px solid #555;
             background: rgba(255,255,255,0.1);
         }
         #alki-paperdoll div {
             position: absolute;
-            background-image: url('static/assets/rei_sprite_alpha.png');
+            background-image: url('static/assets/rem_sprite_alpha.png');
             background-repeat: no-repeat;
             border: 1px dashed rgba(255,0,0,0.5); /* Show bounding box for debugging */
+            mix-blend-mode: screen; /* This will make the black boxes disappear if you have a dark background! */
         }
-        
-        #layer-base-head { width: 91px; height: 103px; z-index: 1; }
-        #layer-torso { width: 93px; height: 35px; z-index: 2; }
-        #layer-eyes { width: 56px; height: 32px; z-index: 3; }
-        #layer-mouth { width: 16px; height: 11px; z-index: 3; }
 
         .controls { flex: 1; display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto;}
         .control-group { background: #222; padding: 15px; border-radius: 8px; }
@@ -39,6 +34,7 @@
 
     <div>
         <h2>Preview</h2>
+        <p>Using CSS mix-blend-mode: screen to hide black boxes.</p>
         <div id="alki-paperdoll">
             <div id="layer-base-head"></div>
             <div id="layer-torso"></div>
@@ -53,10 +49,10 @@
 
     <script>
         const layers = [
-            { id: 'layer-base-head', name: 'Base Head', defaultTop: 0, defaultLeft: 30, defaultBgX: -53, defaultBgY: -183, w: 91, h: 103 },
-            { id: 'layer-torso', name: 'Torso', defaultTop: 90, defaultLeft: 29, defaultBgX: -333, defaultBgY: -210, w: 93, h: 35 },
-            { id: 'layer-eyes', name: 'Eyes', defaultTop: 45, defaultLeft: 48, defaultBgX: -182, defaultBgY: -40, w: 56, h: 32 },
-            { id: 'layer-mouth', name: 'Mouth', defaultTop: 75, defaultLeft: 68, defaultBgX: -182, defaultBgY: -125, w: 16, h: 11 }
+            { id: 'layer-base-head', name: 'Base Head', defaultTop: 0, defaultLeft: 0, defaultBgX: 0, defaultBgY: 0, w: 200, h: 200 },
+            { id: 'layer-torso', name: 'Torso', defaultTop: 0, defaultLeft: 0, defaultBgX: 0, defaultBgY: 0, w: 200, h: 200 },
+            { id: 'layer-eyes', name: 'Eyes', defaultTop: 0, defaultLeft: 0, defaultBgX: 0, defaultBgY: 0, w: 50, h: 50 },
+            { id: 'layer-mouth', name: 'Mouth', defaultTop: 0, defaultLeft: 0, defaultBgX: 0, defaultBgY: 0, w: 50, h: 50 }
         ];
 
         const controlsDiv = document.getElementById('controls');
@@ -70,10 +66,12 @@
             group.innerHTML = `<h3>${layer.name}</h3>`;
 
             const props = [
-                { name: 'Top (Position)', key: 'top', min: -50, max: 150, val: layer.defaultTop },
-                { name: 'Left (Position)', key: 'left', min: -50, max: 150, val: layer.defaultLeft },
-                { name: 'Background X', key: 'bgX', min: -500, max: 0, val: layer.defaultBgX },
-                { name: 'Background Y', key: 'bgY', min: -500, max: 0, val: layer.defaultBgY }
+                { name: 'Top (Position)', key: 'top', min: -500, max: 1000, val: layer.defaultTop },
+                { name: 'Left (Position)', key: 'left', min: -500, max: 1000, val: layer.defaultLeft },
+                { name: 'Background X', key: 'bgX', min: -4500, max: 0, val: layer.defaultBgX },
+                { name: 'Background Y', key: 'bgY', min: -4500, max: 0, val: layer.defaultBgY },
+                { name: 'Width', key: 'w', min: 10, max: 1000, val: layer.w },
+                { name: 'Height', key: 'h', min: 10, max: 1000, val: layer.h }
             ];
 
             props.forEach(p => {
@@ -92,24 +90,32 @@
                 const l = document.getElementById(`${layer.id}-left`).value;
                 const bx = document.getElementById(`${layer.id}-bgX`).value;
                 const by = document.getElementById(`${layer.id}-bgY`).value;
+                const w = document.getElementById(`${layer.id}-w`).value;
+                const h = document.getElementById(`${layer.id}-h`).value;
 
                 document.getElementById(`${layer.id}-top-val`).innerText = t + 'px';
                 document.getElementById(`${layer.id}-left-val`).innerText = l + 'px';
                 document.getElementById(`${layer.id}-bgX-val`).innerText = bx + 'px';
                 document.getElementById(`${layer.id}-bgY-val`).innerText = by + 'px';
+                document.getElementById(`${layer.id}-w-val`).innerText = w + 'px';
+                document.getElementById(`${layer.id}-h-val`).innerText = h + 'px';
 
                 el.style.top = t + 'px';
                 el.style.left = l + 'px';
+                el.style.width = w + 'px';
+                el.style.height = h + 'px';
                 el.style.backgroundPosition = `${bx}px ${by}px`;
 
                 document.getElementById(`${layer.id}-output`).innerText = `#${layer.id} {
     top: ${t}px;
     left: ${l}px;
+    width: ${w}px;
+    height: ${h}px;
     background-position: ${bx}px ${by}px;
 }`;
             };
 
-            ['top', 'left', 'bgX', 'bgY'].forEach(k => {
+            ['top', 'left', 'bgX', 'bgY', 'w', 'h'].forEach(k => {
                 document.getElementById(`${layer.id}-${k}`).addEventListener('input', updateCSS);
             });
 
