@@ -60,10 +60,11 @@ body {
 /* Paper Doll Rendering Engine */
 #alki-paperdoll {
     position: relative;
-    width: 502px;
-    height: 906px;
+    width: 401px;
+    height: 532px;
     margin: 0 auto;
-    transform: scale(0.35); /* Scaled down heavily to fit on mobile screens */
+    margin-top: 122px;
+    transform: scale(0.37);
     transform-origin: center top;
 }
 
@@ -75,8 +76,8 @@ body {
 }
 
 #layer-base-head {
-    top: -70px;
-    left: -40px;
+    top: -46px;
+    left: -93px;
     width: 502px;
     height: 906px;
     background-position: -7px -237px;
@@ -84,8 +85,8 @@ body {
 }
 
 #layer-eyes {
-    top: 61px;
-    left: 203px;
+    top: 87px;
+    left: 148px;
     width: 52px;
     height: 75px;
     background-position: -3px -116px;
@@ -93,8 +94,8 @@ body {
 }
 
 #layer-mouth {
-    top: 164px;
-    left: 163px;
+    top: 178px;
+    left: 111px;
     width: 31px;
     height: 28px;
     background-position: -3px -44px;
