@@ -1,19 +1,14 @@
-import google.generativeai as genai
 import os
+import requests
+import json
 
 # To use this, you need a Gemini API Key from Google AI Studio (it's free!)
 # You can set it in your Termux environment: export GEMINI_API_KEY="your_key_here"
 # Or just paste it directly below (but don't commit it to GitHub if you make it public!)
 API_KEY = os.environ.get("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY_HERE")
 
-if API_KEY != "YOUR_GEMINI_API_KEY_HERE":
-    genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-else:
-    model = None
-
 def generate_alki_response(user_text, current_emotion):
-    if not model:
+    if API_KEY == "YOUR_GEMINI_API_KEY_HERE" or not API_KEY:
         return "I cannot think right now! My API key is missing."
         
     base_prompt = """You are Mayuri Shiina (often calling yourself "Mayushii"). You are a sweet, cheerful, and incredibly emotionally perceptive girl acting as the user's digital companion.
@@ -36,11 +31,21 @@ The user's current emotion is: [INSERT_DYNAMIC_EMOTION_HERE]
 User says: """
 
     # Inject the current emotion into the prompt
-    final_prompt = base_prompt.replace("[INSERT_DYNAMIC_EMOTION_HERE]", current_emotion) + user_text
+    final_prompt = base_prompt.replace("[INSERT_DYNAMIC_EMOTION_HERE]", current_emotion) + "\n\n" + user_text
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+    headers = {'Content-Type': 'application/json'}
+    data = {
+        "contents": [{
+            "parts": [{"text": final_prompt}]
+        }]
+    }
     
     try:
-        response = model.generate_content(final_prompt)
-        return response.text.strip()
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        result = response.json()
+        return result['candidates'][0]['content']['parts'][0]['text'].strip()
     except Exception as e:
         print(f"LLM Error: {e}")
         return "Oops, my brain glitched for a second! Tutturu~"
