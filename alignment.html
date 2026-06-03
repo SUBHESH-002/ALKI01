@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ALKI Sprite Aligner</title>
+    <style>
+        body { background: #333; color: white; font-family: sans-serif; display: flex; gap: 40px; padding: 20px; }
+        
+        /* The exact CSS from style.css */
+        #alki-paperdoll {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            transform: scale(2);
+            transform-origin: top left;
+            border: 1px solid #555;
+            background: rgba(255,255,255,0.1);
+        }
+        #alki-paperdoll div {
+            position: absolute;
+            background-image: url('static/assets/rei_sprite_alpha.png');
+            background-repeat: no-repeat;
+            border: 1px dashed rgba(255,0,0,0.5); /* Show bounding box for debugging */
+        }
+        
+        #layer-base-head { width: 91px; height: 103px; z-index: 1; }
+        #layer-torso { width: 93px; height: 35px; z-index: 2; }
+        #layer-eyes { width: 56px; height: 32px; z-index: 3; }
+        #layer-mouth { width: 16px; height: 11px; z-index: 3; }
+
+        .controls { flex: 1; display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto;}
+        .control-group { background: #222; padding: 15px; border-radius: 8px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px;}
+        input[type=range] { width: 100%; margin-bottom: 10px; }
+        .output { background: #111; padding: 10px; font-family: monospace; white-space: pre-wrap;}
+    </style>
+</head>
+<body>
+
+    <div>
+        <h2>Preview</h2>
+        <div id="alki-paperdoll">
+            <div id="layer-base-head"></div>
+            <div id="layer-torso"></div>
+            <div id="layer-eyes"></div>
+            <div id="layer-mouth"></div>
+        </div>
+    </div>
+
+    <div class="controls" id="controls">
+        <!-- Controls will be generated via JS -->
+    </div>
+
+    <script>
+        const layers = [
+            { id: 'layer-base-head', name: 'Base Head', defaultTop: 0, defaultLeft: 30, defaultBgX: -53, defaultBgY: -183, w: 91, h: 103 },
+            { id: 'layer-torso', name: 'Torso', defaultTop: 90, defaultLeft: 29, defaultBgX: -333, defaultBgY: -210, w: 93, h: 35 },
+            { id: 'layer-eyes', name: 'Eyes', defaultTop: 45, defaultLeft: 48, defaultBgX: -182, defaultBgY: -40, w: 56, h: 32 },
+            { id: 'layer-mouth', name: 'Mouth', defaultTop: 75, defaultLeft: 68, defaultBgX: -182, defaultBgY: -125, w: 16, h: 11 }
+        ];
+
+        const controlsDiv = document.getElementById('controls');
+
+        layers.forEach(layer => {
+            const el = document.getElementById(layer.id);
+            
+            // Create UI
+            const group = document.createElement('div');
+            group.className = 'control-group';
+            group.innerHTML = `<h3>${layer.name}</h3>`;
+
+            const props = [
+                { name: 'Top (Position)', key: 'top', min: -50, max: 150, val: layer.defaultTop },
+                { name: 'Left (Position)', key: 'left', min: -50, max: 150, val: layer.defaultLeft },
+                { name: 'Background X', key: 'bgX', min: -500, max: 0, val: layer.defaultBgX },
+                { name: 'Background Y', key: 'bgY', min: -500, max: 0, val: layer.defaultBgY }
+            ];
+
+            props.forEach(p => {
+                group.innerHTML += `
+                    <label>${p.name}: <span id="${layer.id}-${p.key}-val">${p.val}px</span></label>
+                    <input type="range" id="${layer.id}-${p.key}" min="${p.min}" max="${p.max}" value="${p.val}">
+                `;
+            });
+
+            group.innerHTML += `<div class="output" id="${layer.id}-output"></div>`;
+            controlsDiv.appendChild(group);
+
+            // Add Event Listeners
+            const updateCSS = () => {
+                const t = document.getElementById(`${layer.id}-top`).value;
+                const l = document.getElementById(`${layer.id}-left`).value;
+                const bx = document.getElementById(`${layer.id}-bgX`).value;
+                const by = document.getElementById(`${layer.id}-bgY`).value;
+
+                document.getElementById(`${layer.id}-top-val`).innerText = t + 'px';
+                document.getElementById(`${layer.id}-left-val`).innerText = l + 'px';
+                document.getElementById(`${layer.id}-bgX-val`).innerText = bx + 'px';
+                document.getElementById(`${layer.id}-bgY-val`).innerText = by + 'px';
+
+                el.style.top = t + 'px';
+                el.style.left = l + 'px';
+                el.style.backgroundPosition = `${bx}px ${by}px`;
+
+                document.getElementById(`${layer.id}-output`).innerText = `#${layer.id} {
+    top: ${t}px;
+    left: ${l}px;
+    background-position: ${bx}px ${by}px;
+}`;
+            };
+
+            ['top', 'left', 'bgX', 'bgY'].forEach(k => {
+                document.getElementById(`${layer.id}-${k}`).addEventListener('input', updateCSS);
+            });
+
+            // Initial render
+            updateCSS();
+        });
+    </script>
+</body>
+</html>

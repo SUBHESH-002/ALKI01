@@ -78,7 +78,7 @@ body {
     width: 91px;
     height: 103px;
     background-position: -53px -183px;
-    top: 0px;
+    top: 21px;
     left: 30px;
     z-index: 1;
 }
@@ -98,18 +98,18 @@ body {
     width: 56px;
     height: 32px;
     background-position: -182px -40px;
-    top: 45px;
+    top: 59px;
     left: 48px;
     z-index: 3;
 }
 
 #layer-mouth {
-    /* Neutral Mouth: X=182, Y=125, W=16, H=11 */
+    /* Neutral Mouth: X=182, Y=264, W=16, H=11 */
     width: 16px;
     height: 11px;
-    background-position: -182px -125px;
+    background-position: -182px -264px;
     top: 75px;
-    left: 68px;
+    left: 72px;
     z-index: 3;
 }
 
