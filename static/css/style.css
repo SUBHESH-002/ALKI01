@@ -60,11 +60,11 @@ body {
 /* Paper Doll Rendering Engine */
 #alki-paperdoll {
     position: relative;
-    width: 150px;
-    height: 150px;
+    width: 502px;
+    height: 906px;
     margin: 0 auto;
-    transform: scale(2);
-    transform-origin: center bottom;
+    transform: scale(0.35); /* Scaled down heavily to fit on mobile screens */
+    transform-origin: center top;
 }
 
 #alki-paperdoll div {
@@ -75,42 +75,29 @@ body {
 }
 
 #layer-base-head {
-    /* Coordinates: X=53, Y=183, W=91, H=103 */
-    width: 91px;
-    height: 103px;
-    background-position: -53px -183px;
-    top: 21px;
-    left: 30px;
+    top: -70px;
+    left: -40px;
+    width: 502px;
+    height: 906px;
+    background-position: -7px -237px;
     z-index: 1;
 }
 
-#layer-torso {
-    /* Torso Collar: X=333, Y=210, W=93, H=35 */
-    width: 93px;
-    height: 35px;
-    background-position: -333px -210px;
-    top: 90px;
-    left: 29px;
-    z-index: 2;
-}
-
 #layer-eyes {
-    /* Neutral Eyes: X=182, Y=40, W=56, H=32 */
-    width: 56px;
-    height: 32px;
-    background-position: -182px -40px;
-    top: 59px;
-    left: 48px;
+    top: 61px;
+    left: 203px;
+    width: 52px;
+    height: 75px;
+    background-position: -3px -116px;
     z-index: 3;
 }
 
 #layer-mouth {
-    /* Neutral Mouth: X=182, Y=264, W=16, H=11 */
-    width: 16px;
-    height: 11px;
-    background-position: -182px -264px;
-    top: 75px;
-    left: 72px;
+    top: 164px;
+    left: 163px;
+    width: 31px;
+    height: 28px;
+    background-position: -3px -44px;
     z-index: 3;
 }
 

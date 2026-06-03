@@ -27,10 +27,10 @@ socket.on('emotion_update', (data) => {
 
     // Swap the character features (Day 2 Paper Doll logic)
     const emotionMap = {
-        'neutral': { eyes: '-182px -40px', mouth: '-182px -264px' },
-        'happy': { eyes: '-182px -80px', mouth: '-204px -120px' }, // Using different eye/mouth coords from OpenCV
-        'sad': { eyes: '-246px -40px', mouth: '-268px -120px' },
-        'surprised': { eyes: '-175px -287px', mouth: '-204px -144px' }
+        'neutral': { eyes: '-3px -116px', mouth: '-3px -44px' },
+        'happy': { eyes: '-3px -116px', mouth: '-3px -44px' }, // Needs proper mapping later!
+        'sad': { eyes: '-3px -116px', mouth: '-3px -44px' }, // Needs proper mapping later!
+        'surprised': { eyes: '-3px -116px', mouth: '-3px -44px' } // Needs proper mapping later!
     };
     
     if (emotionMap[newEmotion] && layerEyes && layerMouth) {
