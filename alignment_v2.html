@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ALKI Sprite Aligner V2</title>
+    <style>
+        body { background: #333; color: white; font-family: sans-serif; display: flex; gap: 40px; padding: 20px; }
+        
+        /* Container for the app to simulate phone screen */
+        .phone-simulator {
+            width: 360px;
+            height: 640px;
+            border: 2px solid #666;
+            background: #222;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #alki-paperdoll {
+            position: relative;
+            margin: 0 auto;
+            border: 1px solid #555;
+            background: rgba(255,255,255,0.1);
+            transform-origin: center top;
+        }
+
+        #alki-paperdoll div {
+            position: absolute;
+            background-image: url('static/assets/rem_sprite_alpha.png');
+            background-repeat: no-repeat;
+            border: 1px dashed rgba(255,0,0,0.5);
+            mix-blend-mode: screen; 
+        }
+
+        .controls { flex: 1; display: flex; flex-direction: column; gap: 20px; max-height: 90vh; overflow-y: auto;}
+        .control-group { background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #444; }
+        label { display: block; margin-bottom: 5px; font-size: 14px;}
+        .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        input[type=range] { flex: 1; }
+        button { padding: 5px 15px; cursor: pointer; background: #555; border: none; color: white; border-radius: 4px; font-weight: bold; font-size: 16px;}
+        button:hover { background: #777; }
+        .output { background: #000; padding: 10px; font-family: monospace; white-space: pre-wrap; margin-top: 10px;}
+    </style>
+</head>
+<body>
+
+    <div>
+        <h2>Preview (Phone Simulator)</h2>
+        <div class="phone-simulator">
+            <div id="alki-paperdoll">
+                <div id="layer-base-head"></div>
+                <div id="layer-eyes"></div>
+                <div id="layer-mouth"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls" id="controls">
+        <!-- Controls will be generated via JS -->
+    </div>
+
+    <script>
+        // Data structure for layers including the global container
+        const config = [
+            { 
+                id: 'alki-paperdoll', 
+                name: 'GLOBAL CONTAINER (Fixes "In the Sky")', 
+                props: [
+                    { name: 'Width', key: 'width', min: 100, max: 1000, val: 502 },
+                    { name: 'Height', key: 'height', min: 100, max: 1000, val: 906 },
+                    { name: 'Scale (x100)', key: 'scale', min: 10, max: 200, val: 35 },
+                    { name: 'Top Margin', key: 'marginTop', min: -500, max: 500, val: 0 }
+                ]
+            },
+            { 
+                id: 'layer-base-head', 
+                name: 'Base Body', 
+                props: [
+                    { name: 'Top', key: 'top', min: -500, max: 1000, val: -70 },
+                    { name: 'Left', key: 'left', min: -500, max: 1000, val: -40 },
+                    { name: 'Width', key: 'width', min: 10, max: 1000, val: 502 },
+                    { name: 'Height', key: 'height', min: 10, max: 1000, val: 906 },
+                    { name: 'Bg X', key: 'bgX', min: -4500, max: 0, val: -7 },
+                    { name: 'Bg Y', key: 'bgY', min: -4500, max: 0, val: -237 }
+                ]
+            },
+            { 
+                id: 'layer-eyes', 
+                name: 'Eyes', 
+                props: [
+                    { name: 'Top', key: 'top', min: -500, max: 1000, val: 61 },
+                    { name: 'Left', key: 'left', min: -500, max: 1000, val: 203 },
+                    { name: 'Width', key: 'width', min: 10, max: 1000, val: 52 },
+                    { name: 'Height', key: 'height', min: 10, max: 1000, val: 75 },
+                    { name: 'Bg X', key: 'bgX', min: -4500, max: 0, val: -3 },
+                    { name: 'Bg Y', key: 'bgY', min: -4500, max: 0, val: -116 }
+                ]
+            },
+            { 
+                id: 'layer-mouth', 
+                name: 'Mouth', 
+                props: [
+                    { name: 'Top', key: 'top', min: -500, max: 1000, val: 164 },
+                    { name: 'Left', key: 'left', min: -500, max: 1000, val: 163 },
+                    { name: 'Width', key: 'width', min: 10, max: 1000, val: 31 },
+                    { name: 'Height', key: 'height', min: 10, max: 1000, val: 28 },
+                    { name: 'Bg X', key: 'bgX', min: -4500, max: 0, val: -3 },
+                    { name: 'Bg Y', key: 'bgY', min: -4500, max: 0, val: -44 }
+                ]
+            }
+        ];
+
+        const controlsDiv = document.getElementById('controls');
+
+        window.adjust = function(inputId, amount) {
+            const input = document.getElementById(inputId);
+            input.value = parseInt(input.value) + amount;
+            updateCSS();
+        };
+
+        window.updateCSS = function() {
+            config.forEach(layer => {
+                const el = document.getElementById(layer.id);
+                let cssText = `#${layer.id} {\n`;
+                
+                layer.props.forEach(p => {
+                    const inputId = `${layer.id}-${p.key}`;
+                    const val = document.getElementById(inputId).value;
+                    document.getElementById(`${inputId}-val`).innerText = val;
+                    
+                    if (layer.id === 'alki-paperdoll') {
+                        if (p.key === 'scale') {
+                            el.style.transform = `scale(${val / 100})`;
+                            cssText += `    transform: scale(${val / 100});\n`;
+                        } else if (p.key === 'marginTop') {
+                            el.style.marginTop = `${val}px`;
+                            cssText += `    margin-top: ${val}px;\n`;
+                        } else {
+                            el.style[p.key] = `${val}px`;
+                            cssText += `    ${p.key}: ${val}px;\n`;
+                        }
+                    } else {
+                        if (p.key === 'bgX' || p.key === 'bgY') {
+                            // Handled together below
+                        } else {
+                            el.style[p.key] = `${val}px`;
+                            cssText += `    ${p.key}: ${val}px;\n`;
+                        }
+                    }
+                });
+
+                if (layer.id !== 'alki-paperdoll') {
+                    const bgX = document.getElementById(`${layer.id}-bgX`).value;
+                    const bgY = document.getElementById(`${layer.id}-bgY`).value;
+                    el.style.backgroundPosition = `${bgX}px ${bgY}px`;
+                    cssText += `    background-position: ${bgX}px ${bgY}px;\n`;
+                }
+
+                cssText += `}`;
+                document.getElementById(`${layer.id}-output`).innerText = cssText;
+            });
+        };
+
+        config.forEach(layer => {
+            const group = document.createElement('div');
+            group.className = 'control-group';
+            group.innerHTML = `<h3>${layer.name}</h3>`;
+
+            layer.props.forEach(p => {
+                const inputId = `${layer.id}-${p.key}`;
+                group.innerHTML += `
+                    <label>${p.name}: <span id="${inputId}-val">${p.val}</span></label>
+                    <div class="slider-row">
+                        <button onclick="adjust('${inputId}', -1)">-</button>
+                        <input type="range" id="${inputId}" min="${p.min}" max="${p.max}" value="${p.val}" oninput="updateCSS()">
+                        <button onclick="adjust('${inputId}', 1)">+</button>
+                    </div>
+                `;
+            });
+
+            group.innerHTML += `<div class="output" id="${layer.id}-output"></div>`;
+            controlsDiv.appendChild(group);
+        });
+
+        // Initial render
+        updateCSS();
+    </script>
+</body>
+</html>
