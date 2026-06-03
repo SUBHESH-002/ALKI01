@@ -57,8 +57,93 @@ body {
     box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
 }
 
-/* Emotion state colors for the placeholder */
-.sprite-strip.happy { background-color: #4CAF50; box-shadow: 0 0 40px #4CAF50; transform: scale(1.05); }
-.sprite-strip.sad { background-color: #2196F3; box-shadow: 0 0 40px #2196F3; transform: translateY(10px); }
-.sprite-strip.surprised { background-color: #FF9800; box-shadow: 0 0 40px #FF9800; transform: scale(1.1); }
-.sprite-strip.neutral { background-color: #9E9E9E; box-shadow: 0 0 20px #9E9E9E; }
+/* Paper Doll Rendering Engine */
+#alki-paperdoll {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    transform: scale(2);
+    transform-origin: center bottom;
+}
+
+#alki-paperdoll div {
+    position: absolute;
+    background-image: url('/static/assets/rei_sprite_alpha.png');
+    background-repeat: no-repeat;
+}
+
+#layer-base-head {
+    /* Coordinates: X=53, Y=183, W=91, H=103 */
+    width: 91px;
+    height: 103px;
+    background-position: -53px -183px;
+    top: 0px;
+    left: 30px;
+    z-index: 1;
+}
+
+#layer-torso {
+    /* Torso Collar: X=333, Y=210, W=93, H=35 */
+    width: 93px;
+    height: 35px;
+    background-position: -333px -210px;
+    top: 90px;
+    left: 29px;
+    z-index: 2;
+}
+
+#layer-eyes {
+    /* Neutral Eyes: X=182, Y=40, W=56, H=32 */
+    width: 56px;
+    height: 32px;
+    background-position: -182px -40px;
+    top: 45px;
+    left: 48px;
+    z-index: 3;
+}
+
+#layer-mouth {
+    /* Neutral Mouth: X=182, Y=125, W=16, H=11 */
+    width: 16px;
+    height: 11px;
+    background-position: -182px -125px;
+    top: 75px;
+    left: 68px;
+    z-index: 3;
+}
+
+/* Chat Input Area (Day 3) */
+.chat-input-area {
+    margin-top: 40px;
+    display: flex;
+    gap: 10px;
+    width: 80%;
+    max-width: 400px;
+}
+
+#chat-input {
+    flex: 1;
+    padding: 12px 15px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1rem;
+}
+
+#send-btn {
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: none;
+    background: #FF9800;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#send-btn:hover {
+    background: #F57C00;
+}

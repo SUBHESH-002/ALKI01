@@ -17,8 +17,19 @@
 
     <!-- Character Display Area -->
     <div class="character-viewport">
-        <!-- For Day 2: We use an actual image that we will swap via Javascript -->
-        <img id="alki-character" src="{{ url_for('static', filename='assets/neutral.gif') }}" alt="ALKI Character" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+        <!-- Day 2 (Pivot): Modular Sprite Sheet Paper Doll -->
+        <div id="alki-paperdoll">
+            <div id="layer-base-head"></div>
+            <div id="layer-torso"></div>
+            <div id="layer-eyes"></div>
+            <div id="layer-mouth"></div>
+        </div>
+    </div>
+
+    <!-- Chat Input Area (Day 3) -->
+    <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Say something to ALKI..." autocomplete="off">
+        <button id="send-btn">Send</button>
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

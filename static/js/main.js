@@ -2,9 +2,11 @@
 const socket = io();
 
 // DOM Elements
-const character = document.getElementById('alki-character');
-const emotionLabel = document.getElementById('emotion-label');
+const layerEyes = document.getElementById('layer-eyes');
+const layerMouth = document.getElementById('layer-mouth');
 const chatText = document.getElementById('chat-text');
+const chatInput = document.getElementById('chat-input');
+const sendBtn = document.getElementById('send-btn');
 
 socket.on('connect', () => {
     console.log('Successfully connected to ALKI server!');
@@ -23,7 +25,43 @@ socket.on('emotion_update', (data) => {
     // Update UI text
     chatText.innerText = `You look ${newEmotion}!`;
 
-    // Swap the character image (Day 2 visual logic)
-    // Make sure you have neutral.gif, happy.gif, sad.gif, and surprised.gif in your static/assets folder!
-    character.src = `/static/assets/${newEmotion}.gif`;
+    // Swap the character features (Day 2 Paper Doll logic)
+    const emotionMap = {
+        'neutral': { eyes: '-182px -40px', mouth: '-182px -125px' },
+        'happy': { eyes: '-182px -80px', mouth: '-204px -120px' }, // Using different eye/mouth coords from OpenCV
+        'sad': { eyes: '-246px -40px', mouth: '-268px -120px' },
+        'surprised': { eyes: '-175px -287px', mouth: '-204px -144px' }
+    };
+    
+    if (emotionMap[newEmotion] && layerEyes && layerMouth) {
+        layerEyes.style.backgroundPosition = emotionMap[newEmotion].eyes;
+        layerMouth.style.backgroundPosition = emotionMap[newEmotion].mouth;
+    }
+});
+
+// Chat Logic (Day 3)
+function sendMessage() {
+    const text = chatInput.value.trim();
+    if (text === "") return;
+    
+    // Show user message briefly
+    chatText.innerText = `You: ${text}`;
+    chatInput.value = "";
+    
+    // Send to backend
+    socket.emit('chat_message', { text: text });
+}
+
+sendBtn.addEventListener('click', sendMessage);
+
+chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+
+// Receive ALKI's reply
+socket.on('chat_reply', (data) => {
+    console.log('ALKI replied:', data.text);
+    chatText.innerText = data.text;
 });
