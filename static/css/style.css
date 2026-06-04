@@ -1,5 +1,6 @@
 /* ===================================================
    ALKI Companion — Day 2: Sprite Swap Stylesheet
+   Mobile-first layout
    =================================================== */
 
 /* ---------- Reset & Base ---------- */
@@ -17,20 +18,24 @@ body {
     color: #e0e0f0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow: hidden;
+    min-height: 100dvh; /* dynamic viewport height for mobile */
+    overflow-x: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 16px 12px;
+    padding-top: env(safe-area-inset-top, 16px);
+    padding-bottom: env(safe-area-inset-bottom, 16px);
 }
 
 /* ---------- Chat Bubble ---------- */
 .chat-bubble {
     background: rgba(255, 255, 255, 0.07);
     border-radius: 20px;
-    padding: 14px 24px;
-    margin-bottom: 20px;
-    max-width: 85%;
+    padding: 12px 20px;
+    margin-bottom: 12px;
+    width: 90%;
+    max-width: 400px;
     text-align: center;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -38,36 +43,39 @@ body {
     box-shadow:
         0 4px 20px rgba(0, 0, 0, 0.4),
         inset 0 0 20px rgba(255, 255, 255, 0.03);
-    transition: opacity 0.4s ease, transform 0.3s ease;
     animation: fadeInDown 0.6s ease;
+    flex-shrink: 0;
 }
 
 #chat-text {
     margin: 0;
-    font-size: 1.1rem;
-    line-height: 1.5;
+    font-size: 1rem;
+    line-height: 1.4;
     color: #d0d0e8;
+    word-wrap: break-word;
 }
 
 /* ---------- Character Viewport ---------- */
 .character-viewport {
-    width: 300px;
-    height: 360px;
-    position: relative;
+    flex: 1;
+    width: 100%;
+    max-width: 360px;
     display: flex;
     justify-content: center;
-    align-items: flex-end;
-    margin: 10px 0;
-    /* Subtle glow behind the character */
-    filter: drop-shadow(0 0 20px rgba(100, 120, 255, 0.15));
+    align-items: center;
+    overflow: visible;
+    margin: 8px 0;
 }
 
 .character {
     max-width: 100%;
     max-height: 100%;
+    width: auto;
+    height: auto;
     object-fit: contain;
     image-rendering: auto;
     transition: opacity 0.25s ease-in-out;
+    filter: drop-shadow(0 0 18px rgba(100, 120, 255, 0.15));
 }
 
 /* Fade out briefly when swapping */
@@ -78,10 +86,10 @@ body {
 /* ---------- Emotion Badge (debug) ---------- */
 .emotion-badge {
     display: inline-block;
-    margin-top: 8px;
+    margin: 6px 0;
     padding: 4px 14px;
     border-radius: 12px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -89,6 +97,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.5);
     transition: background 0.3s, color 0.3s, border-color 0.3s;
+    flex-shrink: 0;
 }
 
 .emotion-badge.happy {
@@ -114,16 +123,18 @@ body {
 
 /* ---------- Chat Input Area ---------- */
 .chat-input-area {
-    margin-top: 24px;
+    margin-top: 8px;
     display: flex;
-    gap: 10px;
-    width: 85%;
-    max-width: 420px;
+    gap: 8px;
+    width: 90%;
+    max-width: 400px;
+    flex-shrink: 0;
+    padding-bottom: 8px;
 }
 
 #chat-input {
     flex: 1;
-    padding: 12px 18px;
+    padding: 12px 16px;
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     outline: none;
@@ -145,7 +156,7 @@ body {
 }
 
 #send-btn {
-    padding: 10px 22px;
+    padding: 10px 20px;
     border-radius: 24px;
     border: none;
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
@@ -155,6 +166,7 @@ body {
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.2s;
     box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+    flex-shrink: 0;
 }
 
 #send-btn:hover {
