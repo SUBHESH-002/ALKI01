@@ -2,3 +2,5 @@
 desktop.ini
 __pycache__/
 *.pyc
+grid_preview.png
+bounded_sprites.png

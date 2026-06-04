@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 from flask_socketio import SocketIO, emit
 import time
 import threading
@@ -15,6 +15,19 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 def index():
     # Serve the main ALKI UI
     return render_template('index.html')
+
+# ─── Test Routes ───
+# Hit these in the browser to manually trigger emotion changes
+# e.g.  http://localhost:5000/test/happy
+
+@app.route('/test/<emotion>')
+def test_emotion(emotion):
+    """Emit an emotion_update event to all connected clients, then redirect home."""
+    valid = ['neutral', 'happy', 'sad', 'surprised']
+    if emotion not in valid:
+        emotion = 'neutral'
+    socketio.emit('emotion_update', {'emotion': emotion})
+    return redirect(url_for('index'))
 
 @socketio.on('connect')
 def test_connect():

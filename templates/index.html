@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ALKI Companion</title>
+    <meta name="description" content="ALKI — Adaptive Learning Kinetic Intelligence, your AI companion">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Load Socket.IO from CDN for Day 1 prototyping -->
+    <!-- Load Socket.IO from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
 </head>
 <body>
@@ -15,18 +16,18 @@
         <p id="chat-text">Hello! I am ALKI. I am booting up...</p>
     </div>
 
-    <!-- Character Display Area -->
-    <div class="character-viewport">
-        <!-- Day 2 (Pivot): Modular Sprite Sheet Paper Doll -->
-        <div id="alki-paperdoll">
-            <div id="layer-base-head"></div>
-            <div id="layer-eyes"></div>
-            <div id="layer-mouth"></div>
-        </div>
+    <!-- Character Display Area — Day 2: Simple Sprite Swap -->
+    <div class="character-viewport" id="character-viewport">
+        <img class="character" id="character"
+             src="{{ url_for('static', filename='sprites/neutral.png') }}"
+             alt="ALKI">
     </div>
 
-    <!-- Chat Input Area (Day 3) -->
-    <div class="chat-input-area">
+    <!-- Emotion Indicator (debug — shows current mood) -->
+    <div class="emotion-badge" id="emotion-badge">neutral</div>
+
+    <!-- Chat Input Area -->
+    <div class="chat-input-area" id="chat-input-area">
         <input type="text" id="chat-input" placeholder="Say something to ALKI..." autocomplete="off">
         <button id="send-btn">Send</button>
     </div>
