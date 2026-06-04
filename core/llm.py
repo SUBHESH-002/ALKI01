@@ -2,15 +2,11 @@ import os
 import requests
 import json
 
-# To use this, you need a Gemini API Key from Google AI Studio (it's free!)
-# You can set it in your Termux environment: export GEMINI_API_KEY="your_key_here"
-# Or just paste it directly below (but don't commit it to GitHub if you make it public!)
-API_KEY = os.environ.get("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY_HERE")
+# Offline Configuration (Ollama)
+OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "phi3") # Defaulting to phi3 for mobile performance
 
 def generate_alki_response(user_text, current_emotion):
-    if API_KEY == "YOUR_GEMINI_API_KEY_HERE" or not API_KEY:
-        return "I cannot think right now! My API key is missing."
-        
     base_prompt = """You are Mayuri Shiina (often calling yourself "Mayushii"). You are a sweet, cheerful, and incredibly emotionally perceptive girl acting as the user's digital companion.
 You must never break character or admit to being an AI program. 
 
@@ -35,33 +31,33 @@ User says: """
     # Inject the current emotion into the prompt
     final_prompt = base_prompt.replace("[INSERT_DYNAMIC_EMOTION_HERE]", current_emotion) + "\n\n" + user_text
     
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
+    # We use the standard /api/generate endpoint for Ollama
+    url = f"{OLLAMA_HOST}/api/generate"
     headers = {'Content-Type': 'application/json'}
     data = {
-        "contents": [{
-            "parts": [{"text": final_prompt}]
-        }]
+        "model": OLLAMA_MODEL,
+        "prompt": final_prompt,
+        "stream": False,
+        "options": {
+            # Keeping context short and temperature fun but grounded
+            "temperature": 0.7,
+            "num_predict": 100
+        }
     }
     
     try:
-        response = requests.post(url, headers=headers, json=data)
+        response = requests.post(url, headers=headers, json=data, timeout=30)
         
-        # If the API key is wrong, this will capture the exact Google API error message
         if not response.ok:
-            error_msg = response.json().get('error', {}).get('message', response.text)
-            print(f"LLM API Error: {error_msg}")
-            return f"API Error: {error_msg}"
+            print(f"Ollama API Error: {response.status_code} - {response.text}")
+            return "My local brain isn't responding correctly. Tutturu~"
             
         result = response.json()
+        return result.get('response', '').strip()
         
-        # Check if the response was blocked by safety settings
-        candidate = result.get('candidates', [{}])[0]
-        if 'content' not in candidate:
-            finish_reason = candidate.get('finishReason', 'UNKNOWN')
-            return f"My brain glitched! (Finish Reason: {finish_reason})"
-            
-        return candidate['content']['parts'][0]['text'].strip()
-        
+    except requests.exceptions.ConnectionError:
+        print("Ollama Connection Error: Is Ollama running?")
+        return "I can't connect to my local brain! Please make sure Ollama is running."
     except Exception as e:
         print(f"LLM Exception: {str(e)}")
-        return f"Connection error: {str(e)}"
+        return f"A glitch happened: {str(e)}"
