@@ -35,7 +35,7 @@ User says: """
     # Inject the current emotion into the prompt
     final_prompt = base_prompt.replace("[INSERT_DYNAMIC_EMOTION_HERE]", current_emotion) + "\n\n" + user_text
     
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
     headers = {'Content-Type': 'application/json'}
     data = {
         "contents": [{
