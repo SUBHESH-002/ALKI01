@@ -45,9 +45,23 @@ User says: """
     
     try:
         response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
+        
+        # If the API key is wrong, this will capture the exact Google API error message
+        if not response.ok:
+            error_msg = response.json().get('error', {}).get('message', response.text)
+            print(f"LLM API Error: {error_msg}")
+            return f"API Error: {error_msg}"
+            
         result = response.json()
-        return result['candidates'][0]['content']['parts'][0]['text'].strip()
+        
+        # Check if the response was blocked by safety settings
+        candidate = result.get('candidates', [{}])[0]
+        if 'content' not in candidate:
+            finish_reason = candidate.get('finishReason', 'UNKNOWN')
+            return f"My brain glitched! (Finish Reason: {finish_reason})"
+            
+        return candidate['content']['parts'][0]['text'].strip()
+        
     except Exception as e:
-        print(f"LLM Error: {e}")
-        return "Oops, my brain glitched for a second! Tutturu~"
+        print(f"LLM Exception: {str(e)}")
+        return f"Connection error: {str(e)}"
