@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procedural Robot Face (Hardware Emulation)</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Consolas', 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .hardware-container {
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8),
+                        inset 0 2px 0px rgba(255,255,255,0.1);
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .screen-bezel {
+            background: #000;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,1);
+            position: relative;
+        }
+
+        /* 
+           The actual display. Emulating a low-res OLED or Phosphor screen.
+           We use drop-shadows on the canvas drawing, but we can also add CSS 
+           scanlines or glow here. 
+        */
+        #screen {
+            background-color: #050a05;
+            border-radius: 8px;
+            image-rendering: pixelated;
+            box-shadow: 0 0 10px rgba(46, 213, 115, 0.2);
+        }
+
+        /* Scanline effect */
+        .screen-bezel::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            border-radius: 8px;
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+        }
+
+        button {
+            padding: 12px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #252525;
+            color: #2ed573;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        button:hover {
+            background: #333;
+            border-color: #2ed573;
+            box-shadow: 0 0 15px rgba(46, 213, 115, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.95);
+            background: #2ed573;
+            color: #000;
+        }
+
+        .info {
+            max-width: 400px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .status {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #666;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="info">
+        <h2 style="color: #2ed573; margin-bottom: 5px;">Hardware Display Emulator</h2>
+        <p style="font-size: 14px; color: #aaa;">Procedural Shape Drawing via Math. Rendering @ 60fps.</p>
+    </div>
+
+    <div class="hardware-container">
+        <div class="screen-bezel">
+            <!-- The Frame Buffer (Canvas) -->
+            <canvas id="screen" width="300" height="200"></canvas>
+        </div>
+
+        <div class="controls">
+            <button onclick="setEmotion('neutral')">Neutral</button>
+            <button onclick="setEmotion('happy')">Happy</button>
+            <button onclick="setEmotion('cute')">Cute</button>
+            <button onclick="setEmotion('squint')">Squint</button>
+            <button onclick="setEmotion('dizzy')">Dizzy</button>
+            <button onclick="setEmotion('error')">Error</button>
+            <button onclick="setEmotion('wink')">Wink</button>
+        </div>
+        
+        <div class="status">
+            <span id="state-disp">STATE: IDLE</span>
+            <span id="fps-disp">FPS: 60</span>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('screen');
+        const ctx = canvas.getContext('2d');
+        const stateDisp = document.getElementById('state-disp');
+
+        // --- Hardware State Machine ---
+        let currentEmotion = 'neutral';
+        let targetEmotion = 'neutral';
+        
+        // Blink mechanics
+        let blinkState = 1.0; // 1.0 = fully open, 0.0 = closed
+        let isBlinking = false;
+        let blinkSpeed = 0.25; // 4 frames to close (1.0 / 0.25)
+        
+        // Morph mechanics (for fluid transitions between shapes)
+        // We'll track an interpolation value from 0 to 1 for shape morphing
+        let morphState = 1.0; 
+
+        // Rendering setup
+        const colorPhosphor = '#2ed573';
+        const colorBg = '#050a05';
+
+        // Set emotion from buttons
+        function setEmotion(emotion) {
+            targetEmotion = emotion;
+            // Trigger a quick "blink/morph" transition
+            isBlinking = true;
+            blinkSpeed = 0.15; // slightly slower blink during transition
+        }
+
+        // --- Procedural Drawing Routines ---
+
+        // Draw a spiral for the dizzy eyes
+        function drawSpiral(cx, cy, maxRadius, time) {
+            ctx.beginPath();
+            for (let i = 0; i <= 20; i++) {
+                const angle = i * 0.8 + time;
+                const radius = (i / 20) * maxRadius;
+                const x = cx + Math.cos(angle) * radius;
+                const y = cy + Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        // The main drawing function that maps instructions to the buffer
+        function renderFace(emotion, blinkY, time) {
+            // Screen clear
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = colorBg;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Setup "Phosphor" style
+            ctx.strokeStyle = colorPhosphor;
+            ctx.fillStyle = colorPhosphor;
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // Add slight glow
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = colorPhosphor;
+
+            const leftX = 90;
+            const rightX = 210;
+            const eyeY = 80;
+            const mouthY = 150;
+            
+            // Limit blink scaling so it doesn't invert
+            const scaleY = Math.max(0.05, blinkY);
+
+            ctx.save();
+
+            switch(emotion) {
+                case 'neutral':
+                    // O_O
+                    ctx.beginPath();
+                    ctx.ellipse(leftX, eyeY, 15, 25 * scaleY, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.ellipse(rightX, eyeY, 15, 25 * scaleY, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(130, mouthY);
+                    ctx.lineTo(170, mouthY);
+                    ctx.stroke();
+                    break;
+
+                case 'happy':
+                    // ^_^
+                    ctx.beginPath();
+                    ctx.moveTo(leftX - 25, eyeY + 15 * scaleY);
+                    ctx.quadraticCurveTo(leftX, eyeY - 25 * scaleY, leftX + 25, eyeY + 15 * scaleY);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(rightX - 25, eyeY + 15 * scaleY);
+                    ctx.quadraticCurveTo(rightX, eyeY - 25 * scaleY, rightX + 25, eyeY + 15 * scaleY);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.arc(150, 135, 30, 0, Math.PI); // smile
+                    ctx.stroke();
+                    break;
+
+                case 'wink':
+                    // ^_O
+                    // Left Eye (Wink)
+                    ctx.beginPath();
+                    ctx.moveTo(leftX - 25, eyeY + 15 * scaleY);
+                    ctx.quadraticCurveTo(leftX, eyeY - 25 * scaleY, leftX + 25, eyeY + 15 * scaleY);
+                    ctx.stroke();
+                    
+                    // Right Eye (Normal)
+                    ctx.beginPath();
+                    ctx.ellipse(rightX, eyeY, 15, 25, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Smile
+                    ctx.beginPath();
+                    ctx.arc(150, 135, 30, 0, Math.PI);
+                    ctx.stroke();
+                    break;
+
+                case 'cute':
+                    // >_> or UwU
+                    ctx.beginPath();
+                    ctx.moveTo(leftX - 20, eyeY - 15 * scaleY);
+                    ctx.lineTo(leftX + 15, eyeY);
+                    ctx.lineTo(leftX - 20, eyeY + 15 * scaleY);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(rightX + 20, eyeY - 15 * scaleY);
+                    ctx.lineTo(rightX - 15, eyeY);
+                    ctx.lineTo(rightX + 20, eyeY + 15 * scaleY);
+                    ctx.stroke();
+                    
+                    // Cat mouth (W)
+                    ctx.beginPath();
+                    ctx.moveTo(125, mouthY-5);
+                    ctx.quadraticCurveTo(137, mouthY+15, 150, mouthY);
+                    ctx.quadraticCurveTo(162, mouthY+15, 175, mouthY-5);
+                    ctx.stroke();
+                    break;
+
+                case 'squint':
+                    // -_-
+                    ctx.beginPath();
+                    ctx.moveTo(leftX - 20, eyeY);
+                    ctx.lineTo(leftX + 20, eyeY);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(rightX - 20, eyeY);
+                    ctx.lineTo(rightX + 20, eyeY);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(130, mouthY + 5);
+                    ctx.lineTo(170, mouthY + 5);
+                    ctx.stroke();
+                    break;
+
+                case 'error':
+                    // X_X
+                    const s = 15 * scaleY;
+                    ctx.beginPath();
+                    ctx.moveTo(leftX - 15, eyeY - s); ctx.lineTo(leftX + 15, eyeY + s);
+                    ctx.moveTo(leftX - 15, eyeY + s); ctx.lineTo(leftX + 15, eyeY - s);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(rightX - 15, eyeY - s); ctx.lineTo(rightX + 15, eyeY + s);
+                    ctx.moveTo(rightX - 15, eyeY + s); ctx.lineTo(rightX + 15, eyeY - s);
+                    ctx.stroke();
+                    
+                    // Squiggly mouth
+                    ctx.beginPath();
+                    ctx.moveTo(120, mouthY + 10);
+                    ctx.lineTo(135, mouthY - 5);
+                    ctx.lineTo(150, mouthY + 10);
+                    ctx.lineTo(165, mouthY - 5);
+                    ctx.lineTo(180, mouthY + 10);
+                    ctx.stroke();
+                    break;
+
+                case 'dizzy':
+                    // @ _ @
+                    drawSpiral(leftX, eyeY, 22 * scaleY, time * 0.005);
+                    drawSpiral(rightX, eyeY, 22 * scaleY, time * 0.005);
+                    
+                    // Uneven open mouth
+                    ctx.beginPath();
+                    ctx.ellipse(150, mouthY + 10, 15, 20 * scaleY, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                    break;
+            }
+
+            ctx.restore();
+        }
+
+        // --- Hardware Cycle Loop ---
+        let lastFrameTime = 0;
+        let fpsCounter = 0;
+        let fpsUpdateTimer = 0;
+
+        function hardwareLoop(timestamp) {
+            // Calculate Delta Time & FPS
+            const dt = timestamp - lastFrameTime;
+            lastFrameTime = timestamp;
+            
+            fpsCounter++;
+            if (timestamp - fpsUpdateTimer > 1000) {
+                document.getElementById('fps-disp').innerText = `FPS: ${fpsCounter}`;
+                fpsCounter = 0;
+                fpsUpdateTimer = timestamp;
+            }
+
+            // 1. The State Machine & Logic
+            if (currentEmotion !== targetEmotion) {
+                stateDisp.innerText = `STATE: TRANSITION`;
+            } else {
+                stateDisp.innerText = `STATE: ${currentEmotion.toUpperCase()}`;
+            }
+
+            if (isBlinking) {
+                blinkState -= blinkSpeed;
+                if (blinkState <= 0) {
+                    // Eye is fully closed. Switch emotion here to hide the transition!
+                    blinkState = 0;
+                    blinkSpeed = -blinkSpeed; // Reverse to open
+                    if (currentEmotion !== targetEmotion) {
+                        currentEmotion = targetEmotion;
+                    }
+                } else if (blinkState >= 1.0) {
+                    blinkState = 1.0;
+                    isBlinking = false;
+                    blinkSpeed = 0.25; // Reset speed
+                }
+            } else {
+                // Idle state random blinking (only if neutral, happy, cute, squint)
+                if (['neutral', 'happy', 'cute', 'squint'].includes(currentEmotion)) {
+                    if (Math.random() < 0.005) { // Roughly every few seconds
+                        isBlinking = true;
+                    }
+                }
+            }
+
+            // 2. The Frame Buffer (Draw)
+            renderFace(currentEmotion, blinkState, timestamp);
+
+            // 3. Screen Refresh
+            requestAnimationFrame(hardwareLoop);
+        }
+
+        // Ignite the microcontroller
+        requestAnimationFrame(hardwareLoop);
+
+    </script>
+</body>
+</html>

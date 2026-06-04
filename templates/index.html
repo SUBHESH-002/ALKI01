@@ -13,23 +13,25 @@
 
     <!-- Chat Bubble for Output -->
     <div class="chat-bubble" id="chat-bubble">
-        <p id="chat-text">Hello! I am ALKI. I am booting up...</p>
+        <p id="chat-text">Booting ALKI OS [v2.0]...</p>
     </div>
 
-    <!-- Character Display Area — Day 2: Simple Sprite Swap -->
-    <div class="character-viewport" id="character-viewport">
-        <img class="character" id="character"
-             src="{{ url_for('static', filename='sprites/neutral.png') }}"
-             alt="ALKI">
+    <!-- Hardware Emulation Container -->
+    <div class="hardware-container">
+        <div class="screen-bezel">
+            <!-- The Frame Buffer (Canvas) -->
+            <canvas id="screen" width="300" height="200"></canvas>
+            <div class="screen-glare"></div>
+        </div>
     </div>
 
     <!-- Emotion Indicator (debug — shows current mood) -->
-    <div class="emotion-badge" id="emotion-badge">neutral</div>
+    <div class="emotion-badge" id="emotion-badge">STATE: BOOT</div>
 
     <!-- Chat Input Area -->
     <div class="chat-input-area" id="chat-input-area">
-        <input type="text" id="chat-input" placeholder="Say something to ALKI..." autocomplete="off">
-        <button id="send-btn">Send</button>
+        <input type="text" id="chat-input" placeholder="Enter command..." autocomplete="off">
+        <button id="send-btn">Transmit</button>
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

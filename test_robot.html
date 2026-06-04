@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Emotion Sprite Test</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .robot-face {
+            /* Adjust dimensions to match the aspect ratio of a single face */
+            width: 280px; 
+            height: 210px;
+            background-image: url('static/robot_sprites.png');
+            /* Since it's a 3x3 grid, setting background-size to 300% makes 1 face fill the div */
+            background-size: 300% 300%; 
+            background-position: 0% 0%;
+            /* A smooth snappy transition for emotion changes */
+            transition: background-position 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 0 20px rgba(0, 255, 128, 0.2));
+            margin-bottom: 40px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #0f3460;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: #e94560;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* Sprite Sheet Background Positions */
+        /* Row 1 */
+        .face-0 { background-position: 0% 0%; }    /* Normal / Smile */
+        .face-1 { background-position: 50% 0%; }   /* Happy */
+        .face-2 { background-position: 100% 0%; }  /* Wink */
+        
+        /* Row 2 */
+        .face-3 { background-position: 0% 50%; }   /* Annoyed / Squint */
+        .face-4 { background-position: 50% 50%; }  /* Cute (UwU) */
+        .face-5 { background-position: 100% 50%; } /* Laughing / Excited */
+        
+        /* Row 3 */
+        .face-6 { background-position: 0% 100%; }  /* Neutral / Sleepy */
+        .face-7 { background-position: 50% 100%; } /* Error / Dead */
+        .face-8 { background-position: 100% 100%; }/* Dizzy / Confused */
+
+        .label-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 { margin: 0 0 10px 0; }
+        p { margin: 0; color: #a0a0a0; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="label-container">
+        <h2>Robot Emotion Test</h2>
+        <p>Using CSS sprite positioning on a 3x3 grid</p>
+    </div>
+    
+    <div id="robot" class="robot-face face-0"></div>
+
+    <div class="controls">
+        <button onclick="setFace(0, this)">Smile</button>
+        <button onclick="setFace(1, this)">Happy</button>
+        <button onclick="setFace(2, this)">Wink</button>
+        
+        <button onclick="setFace(3, this)">Squint</button>
+        <button onclick="setFace(4, this)">Cute (UwU)</button>
+        <button onclick="setFace(5, this)">Excited</button>
+        
+        <button onclick="setFace(6, this)">Neutral</button>
+        <button onclick="setFace(7, this)">Error</button>
+        <button onclick="setFace(8, this)">Dizzy</button>
+    </div>
+
+    <script>
+        function setFace(index, btn) {
+            const robot = document.getElementById('robot');
+            // Remove any existing face class
+            robot.className = 'robot-face';
+            // Add the new face class
+            robot.classList.add('face-' + index);
+            
+            // Add slight bounce effect on click
+            robot.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                robot.style.transform = 'scale(1)';
+            }, 150);
+        }
+    </script>
+</body>
+</html>

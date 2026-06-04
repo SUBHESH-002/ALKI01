@@ -1,9 +1,7 @@
 /* ===================================================
-   ALKI Companion — Day 2: Sprite Swap Stylesheet
-   Mobile-first layout
+   ALKI Companion — Hardware Emulator UI
    =================================================== */
 
-/* ---------- Reset & Base ---------- */
 * {
     margin: 0;
     padding: 0;
@@ -11,181 +9,172 @@
 }
 
 body {
-    background-color: #0d0d1a;
-    background-image:
-        radial-gradient(ellipse at 50% 20%, rgba(60, 40, 120, 0.3) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 80%, rgba(20, 80, 120, 0.2) 0%, transparent 50%);
-    color: #e0e0f0;
+    background-color: #050505;
+    background-image: 
+        radial-gradient(ellipse at center, rgba(10, 20, 10, 0.8) 0%, #000 100%),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
+    color: #2ed573;
+    font-family: 'Consolas', 'Courier New', monospace;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    min-height: 100dvh; /* dynamic viewport height for mobile */
     overflow-x: hidden;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 16px 12px;
-    padding-top: env(safe-area-inset-top, 16px);
-    padding-bottom: env(safe-area-inset-bottom, 16px);
+    padding: 20px;
 }
 
-/* ---------- Chat Bubble ---------- */
+/* ---------- Chat Bubble (Terminal Output) ---------- */
 .chat-bubble {
-    background: rgba(255, 255, 255, 0.07);
-    border-radius: 20px;
+    background: rgba(0, 15, 0, 0.8);
+    border: 1px solid #2ed573;
+    border-radius: 8px;
     padding: 12px 20px;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
     width: 90%;
-    max-width: 400px;
-    text-align: center;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow:
-        0 4px 20px rgba(0, 0, 0, 0.4),
-        inset 0 0 20px rgba(255, 255, 255, 0.03);
-    animation: fadeInDown 0.6s ease;
-    flex-shrink: 0;
+    max-width: 450px;
+    text-align: left;
+    box-shadow: 0 0 10px rgba(46, 213, 115, 0.2), inset 0 0 10px rgba(46, 213, 115, 0.1);
+    animation: textFlicker 3s infinite;
 }
 
 #chat-text {
     margin: 0;
-    font-size: 1rem;
-    line-height: 1.4;
-    color: #d0d0e8;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #2ed573;
+    text-shadow: 0 0 5px rgba(46, 213, 115, 0.5);
     word-wrap: break-word;
 }
 
-/* ---------- Character Viewport ---------- */
-.character-viewport {
-    flex: 1;
-    width: 100%;
-    max-width: 360px;
+/* ---------- Hardware Container ---------- */
+.hardware-container {
+    background: #111;
+    padding: 25px;
+    border-radius: 20px;
+    border: 2px solid #222;
+    box-shadow: 
+        0 20px 50px rgba(0,0,0,1),
+        inset 0 2px 2px rgba(255,255,255,0.05),
+        inset 0 -2px 5px rgba(0,0,0,0.5);
+    margin-bottom: 15px;
     display: flex;
     justify-content: center;
-    align-items: center;
-    overflow: visible;
-    margin: 8px 0;
+    position: relative;
 }
 
-.character {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    image-rendering: auto;
-    transition: opacity 0.25s ease-in-out;
-    filter: drop-shadow(0 0 18px rgba(100, 120, 255, 0.15));
-}
-
-/* Fade out briefly when swapping */
-.character.swapping {
-    opacity: 0.3;
-}
-
-/* ---------- Emotion Badge (debug) ---------- */
-.emotion-badge {
-    display: inline-block;
-    margin: 6px 0;
-    padding: 4px 14px;
+.screen-bezel {
+    background: #000;
+    padding: 15px;
     border-radius: 12px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.5);
-    transition: background 0.3s, color 0.3s, border-color 0.3s;
-    flex-shrink: 0;
+    box-shadow: inset 0 0 20px #000;
+    position: relative;
+    border: 1px solid #0a0a0a;
 }
 
-.emotion-badge.happy {
-    background: rgba(255, 200, 50, 0.15);
-    border-color: rgba(255, 200, 50, 0.3);
-    color: #ffd060;
+#screen {
+    background-color: #030803;
+    border-radius: 6px;
+    display: block;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+    /* The glow comes from canvas, but we can add subtle box shadow */
+    filter: drop-shadow(0 0 5px rgba(46, 213, 115, 0.2));
 }
-.emotion-badge.sad {
-    background: rgba(80, 130, 255, 0.15);
-    border-color: rgba(80, 130, 255, 0.3);
-    color: #7090ff;
+
+/* Scanline Effect Overlay */
+.screen-bezel::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 4px, 3px 100%;
+    pointer-events: none;
+    border-radius: 6px;
+    z-index: 10;
 }
-.emotion-badge.surprised {
-    background: rgba(255, 100, 150, 0.15);
-    border-color: rgba(255, 100, 150, 0.3);
-    color: #ff80a0;
+
+.screen-glare {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.03) 0%, transparent 100%);
+    pointer-events: none;
+    border-radius: 6px 6px 0 0;
+    z-index: 11;
 }
-.emotion-badge.neutral {
-    background: rgba(150, 150, 180, 0.1);
-    border-color: rgba(150, 150, 180, 0.2);
-    color: rgba(200, 200, 220, 0.6);
+
+/* ---------- Emotion Badge ---------- */
+.emotion-badge {
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #2ed573;
+    margin-bottom: 20px;
+    text-shadow: 0 0 5px #2ed573;
 }
 
 /* ---------- Chat Input Area ---------- */
 .chat-input-area {
-    margin-top: 8px;
     display: flex;
-    gap: 8px;
+    gap: 10px;
     width: 90%;
-    max-width: 400px;
-    flex-shrink: 0;
-    padding-bottom: 8px;
+    max-width: 450px;
 }
 
 #chat-input {
     flex: 1;
-    padding: 12px 16px;
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    outline: none;
-    background: rgba(255, 255, 255, 0.06);
-    color: #e0e0f0;
+    padding: 12px 15px;
+    border-radius: 4px;
+    border: 1px solid #333;
+    background: #0a0a0a;
+    color: #2ed573;
+    font-family: inherit;
     font-size: 1rem;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    transition: all 0.2s;
 }
 
 #chat-input:focus {
-    border-color: rgba(120, 140, 255, 0.4);
-    box-shadow: 0 0 12px rgba(120, 140, 255, 0.15);
+    border-color: #2ed573;
+    box-shadow: 0 0 8px rgba(46, 213, 115, 0.3);
 }
 
 #chat-input::placeholder {
-    color: rgba(200, 200, 220, 0.4);
+    color: #1a5c32;
 }
 
 #send-btn {
     padding: 10px 20px;
-    border-radius: 24px;
-    border: none;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    color: white;
-    font-weight: 600;
-    font-size: 0.95rem;
+    border-radius: 4px;
+    border: 1px solid #2ed573;
+    background: #051405;
+    color: #2ed573;
+    font-family: inherit;
+    font-weight: bold;
     cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.2s;
-    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
-    flex-shrink: 0;
+    text-transform: uppercase;
+    transition: all 0.2s;
 }
 
 #send-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    background: #2ed573;
+    color: #000;
+    box-shadow: 0 0 15px rgba(46, 213, 115, 0.4);
 }
 
 #send-btn:active {
-    transform: translateY(0);
+    transform: translateY(2px);
 }
 
-/* ---------- Animations ---------- */
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-12px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+@keyframes textFlicker {
+    0% { opacity: 0.95; }
+    5% { opacity: 0.85; }
+    10% { opacity: 0.95; }
+    15% { opacity: 1; }
+    100% { opacity: 1; }
 }

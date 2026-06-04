@@ -23,7 +23,13 @@ def index():
 @app.route('/test/<emotion>')
 def test_emotion(emotion):
     """Emit an emotion_update event to all connected clients, then redirect home."""
-    valid = ['neutral', 'happy', 'sad', 'surprised']
+    # We now support a large procedural map
+    valid = [
+        'neutral', 'sleepy', 'stare', 'determined', 'curious', 'smol', 'squint_annoyed', 
+        'happy', 'bored', 'pout', 'playful', 'angry_pout', 'kiss', 'grumpy', 'dizzy', 
+        'sad', 'angry', 'crying_happy', 'crying_sad', 'smug', 'shocked', 
+        'annoyed_tick', 'exhausted', 'joy', 'king', 'cute', 'error', 'wink'
+    ]
     if emotion not in valid:
         emotion = 'neutral'
     socketio.emit('emotion_update', {'emotion': emotion})
@@ -50,10 +56,13 @@ def handle_chat_message(data):
 # A test background thread to simulate sending emotion updates to the frontend
 def background_emotion_simulator():
     global current_emotion
-    emotions = ['neutral', 'happy', 'sad', 'surprised']
+    emotions = [
+        'neutral', 'curious', 'happy', 'playful', 'sleepy', 
+        'stare', 'dizzy', 'cute', 'angry_pout', 'joy'
+    ]
     idx = 0
     while True:
-        time.sleep(10) # Slowed down to 10 seconds so it doesn't distract while chatting
+        time.sleep(12) # Slowed down
         current_emotion = emotions[idx % len(emotions)]
         print(f"Simulating emotion: {current_emotion}")
         socketio.emit('emotion_update', {'emotion': current_emotion})
